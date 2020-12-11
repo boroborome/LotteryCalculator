@@ -7,13 +7,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @SpringBootApplication
 public class LotteryCalculatorApplication {
 
 	public static void main(String[] args) throws IOException {
+		List<LotteryInfo> lotteryInfos = loadAllLotteryInfos();
 
 		LotteryCalculator lotteryCalculator = new LotteryCalculator();
 //		SpringApplication.run(LotteryCalculatorApplication.class, args);
@@ -22,10 +25,7 @@ public class LotteryCalculatorApplication {
 
 		Map<String, Integer> winCounts = new HashMap<>();
 		LotteryInfo nextLottery = null;
-		int lotteryCount = 0;
-		for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-			LotteryInfo info = LotteryInfo.decode(line);
-			lotteryCount++;
+		for (LotteryInfo info : lotteryInfos) {
 
 			LotteryInfo newLottery = lotteryCalculator.accept(info);
 			System.out.print(MessageFormat.format("{0}:{1}",
@@ -44,9 +44,21 @@ public class LotteryCalculatorApplication {
 		}
 
 		System.out.println(winCounts);
-		int cost = lotteryCount * 2;
+		int cost = lotteryInfos.size() * 2;
 		int win = calculateMoney(winCounts);
 		System.out.println(MessageFormat.format("Cost:{0}; Win:{1}", cost, win));
+	}
+
+	private static List<LotteryInfo> loadAllLotteryInfos() throws IOException {
+		InputStream inputStream = LotteryCalculatorApplication.class.getResourceAsStream("/lottery-history.txt");
+		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+		List<LotteryInfo> infos = new ArrayList<>();
+		for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+			LotteryInfo info = LotteryInfo.decode(line);
+			infos.add(info);
+		}
+		return infos;
 	}
 
 	private static int calculateMoney(Map<String, Integer> winCounts) {

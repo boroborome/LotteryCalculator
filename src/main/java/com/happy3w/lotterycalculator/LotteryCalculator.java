@@ -17,19 +17,26 @@ public class LotteryCalculator {
     private List<NumWeight> orderedRed;
     private List<NumWeight> orderedBlue;
 
-    private double forgetRate = 0.568;
-    private Function<Double, Double> rememberLogic = (weight) -> {
-        weight += 1;
-        weight *= weight;
-        return weight;
-    };
+    private double forgetRate;
+    private Function<Double, Double> rememberLogic;
 
-    public LotteryCalculator() {
+    public LotteryCalculator(Function<Double, Double> rememberLogic, double forgetRate) {
         redWeights = newNumWeight(33);
         blueWeights = newNumWeight(16);
 
         orderedRed = new ArrayList<>(Arrays.asList(redWeights));
         orderedBlue = new ArrayList<>(Arrays.asList(blueWeights));
+
+        this.rememberLogic = rememberLogic;
+        this.forgetRate = forgetRate;
+    }
+
+    public LotteryCalculator() {
+        this((weight) -> {
+            weight += 1;
+            weight *= weight;
+            return weight;
+        }, 0.568);
     }
 
     private NumWeight[] newNumWeight(int count) {
