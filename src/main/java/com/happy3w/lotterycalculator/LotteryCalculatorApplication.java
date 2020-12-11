@@ -27,7 +27,7 @@ public class LotteryCalculatorApplication {
 
 		TestScore bestScore = null;
 
-		for (double forgetRate = 0.01; forgetRate < 1; forgetRate += 0.01) {
+		for (double forgetRate = 0.0001; forgetRate < 1; forgetRate += 0.0001) {
 			LotteryCalculator lotteryCalculator = new LotteryCalculator(DefaultRememberFun, forgetRate);
 			Map<String, Integer> winCounts = testCalculator(lotteryCalculator, lotteryInfos);
 			int winMoney = calculateMoney(winCounts);
@@ -49,15 +49,8 @@ public class LotteryCalculatorApplication {
 		for (LotteryInfo info : lotteryInfos) {
 
 			LotteryInfo newLottery = lotteryCalculator.accept(info);
-//			System.out.print(MessageFormat.format("{0}:{1}",
-//					info.getCode(), info.getDesc()));
-			if (nextLottery == null) {
-				System.out.println();
-			} else {
+			if (nextLottery != null) {
 				String winPrice = nextLottery.winPrice(info);
-//				System.out.println(MessageFormat.format("--{0}--{1}",
-//						nextLottery.getDesc(), winPrice));
-
 				int count = winCounts.getOrDefault(winPrice, 0);
 				winCounts.put(winPrice, count + 1);
 			}
