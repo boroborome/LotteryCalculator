@@ -19,34 +19,35 @@ public class LotteryCalculatorApplication {
 		List<LotteryInfo> lotteryInfos = loadAllLotteryInfos();
 
 		LotteryCalculator lotteryCalculator = new LotteryCalculator();
-//		SpringApplication.run(LotteryCalculatorApplication.class, args);
-		InputStream inputStream = LotteryCalculatorApplication.class.getResourceAsStream("/lottery-history.txt");
-		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 
+		Map<String, Integer> winCounts = testCalculator(lotteryCalculator, lotteryInfos);
+		System.out.println(winCounts);
+		int cost = lotteryInfos.size() * 2;
+		int win = calculateMoney(winCounts);
+		System.out.println(MessageFormat.format("Cost:{0}; Win:{1}", cost, win));
+	}
+
+	private static Map<String, Integer> testCalculator(LotteryCalculator lotteryCalculator, List<LotteryInfo> lotteryInfos) {
 		Map<String, Integer> winCounts = new HashMap<>();
 		LotteryInfo nextLottery = null;
 		for (LotteryInfo info : lotteryInfos) {
 
 			LotteryInfo newLottery = lotteryCalculator.accept(info);
-			System.out.print(MessageFormat.format("{0}:{1}",
-					info.getCode(), info.getDesc()));
+//			System.out.print(MessageFormat.format("{0}:{1}",
+//					info.getCode(), info.getDesc()));
 			if (nextLottery == null) {
 				System.out.println();
 			} else {
 				String winPrice = nextLottery.winPrice(info);
-				System.out.println(MessageFormat.format("--{0}--{1}",
-						nextLottery.getDesc(), winPrice));
+//				System.out.println(MessageFormat.format("--{0}--{1}",
+//						nextLottery.getDesc(), winPrice));
 
 				int count = winCounts.getOrDefault(winPrice, 0);
 				winCounts.put(winPrice, count + 1);
 			}
 			nextLottery = newLottery;
 		}
-
-		System.out.println(winCounts);
-		int cost = lotteryInfos.size() * 2;
-		int win = calculateMoney(winCounts);
-		System.out.println(MessageFormat.format("Cost:{0}; Win:{1}", cost, win));
+		return winCounts;
 	}
 
 	private static List<LotteryInfo> loadAllLotteryInfos() throws IOException {
