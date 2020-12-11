@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 
 public class LotteryCalculator {
     private NumWeight[] redWeights;
@@ -17,6 +18,11 @@ public class LotteryCalculator {
     private List<NumWeight> orderedBlue;
 
     private double forgetRate = 0.568;
+    private Function<Double, Double> rememberLogic = (weight) -> {
+        weight += 1;
+        weight *= weight;
+        return weight;
+    };
 
     public LotteryCalculator() {
         redWeights = newNumWeight(33);
@@ -65,10 +71,7 @@ public class LotteryCalculator {
     private void remember(int[] values, NumWeight[] weights) {
         for (int i = values.length - 1; i >= 0; i--) {
             NumWeight weightInfo = weights[values[i] - 1];
-            double weight = weightInfo.weight;
-            weight += 1;
-            weight *= weight;
-            weightInfo.weight = weight;
+            weightInfo.weight = rememberLogic.apply(weightInfo.weight);
         }
     }
 
