@@ -11,20 +11,36 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 @SpringBootApplication
 public class LotteryCalculatorApplication {
 
+	private static Function<Double, Double> DefaultRememberFun = (weight) -> {
+		weight += 1;
+		weight *= weight;
+		return weight;
+	};
+
 	public static void main(String[] args) throws IOException {
 		List<LotteryInfo> lotteryInfos = loadAllLotteryInfos();
 
-		LotteryCalculator lotteryCalculator = new LotteryCalculator();
+		TestScore bestScore = null;
 
-		Map<String, Integer> winCounts = testCalculator(lotteryCalculator, lotteryInfos);
-		System.out.println(winCounts);
+		for (double forgetRate = 0.01; forgetRate < 1; forgetRate += 0.01) {
+			LotteryCalculator lotteryCalculator = new LotteryCalculator(DefaultRememberFun, forgetRate);
+			Map<String, Integer> winCounts = testCalculator(lotteryCalculator, lotteryInfos);
+			int winMoney = calculateMoney(winCounts);
+			if (bestScore == null || bestScore.getWinMoney() < winMoney) {
+				bestScore = new TestScore(forgetRate, winCounts, winMoney);
+			}
+		}
 		int cost = lotteryInfos.size() * 2;
-		int win = calculateMoney(winCounts);
-		System.out.println(MessageFormat.format("Cost:{0}; Win:{1}", cost, win));
+		System.out.println(bestScore.getWinCounts());
+		System.out.println(MessageFormat.format("ForgetRate:{0}; Cost:{1}; Win:{2}",
+				bestScore.getForgetRate(),
+				cost,
+				bestScore.getWinMoney()));
 	}
 
 	private static Map<String, Integer> testCalculator(LotteryCalculator lotteryCalculator, List<LotteryInfo> lotteryInfos) {
