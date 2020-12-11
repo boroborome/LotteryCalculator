@@ -16,6 +16,8 @@ public class LotteryCalculator {
     private List<NumWeight> orderedRed;
     private List<NumWeight> orderedBlue;
 
+    private double forgetRate = 0.568;
+
     public LotteryCalculator() {
         redWeights = newNumWeight(33);
         blueWeights = newNumWeight(16);
@@ -62,13 +64,17 @@ public class LotteryCalculator {
 
     private void remember(int[] values, NumWeight[] weights) {
         for (int i = values.length - 1; i >= 0; i--) {
-            weights[values[i] - 1].weight += 1;
+            NumWeight weightInfo = weights[values[i] - 1];
+            double weight = weightInfo.weight;
+            weight += 1;
+            weight *= weight;
+            weightInfo.weight = weight;
         }
     }
 
     private void forget(NumWeight[] weights) {
         for (int i = weights.length - 1; i >= 0; i--) {
-            weights[i].weight *= 0.999;
+            weights[i].weight *= forgetRate;
         }
     }
 

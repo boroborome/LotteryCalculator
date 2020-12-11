@@ -17,3 +17,11 @@ These additional references should also help you:
 
 * [Gradle Build Scans – insights for your project's build](https://scans.gradle.com#gradle)
 
+curl 'http://www.cwl.gov.cn/cwl_admin/kjxx/findDrawNotice?name=ssq&issueCount=30' \
+  -H 'Pragma: no-cache' \
+  -H 'Cache-Control: no-cache' \
+  -H 'Accept: application/json, text/javascript, */*; q=0.01' \
+  -H 'X-Requested-With: XMLHttpRequest' \
+  -H 'Referer: http://www.cwl.gov.cn/kjxx/ssq/kjgg/' \
+  -H 'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8' > 200.json
+  

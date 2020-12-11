@@ -3,6 +3,9 @@ package com.happy3w.lotterycalculator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Getter
 @AllArgsConstructor
 public class LotteryInfo {
@@ -48,6 +51,19 @@ public class LotteryInfo {
         }
     }
 
+    private static Map<String, Integer> levelMoney = new HashMap<>();
+    static {
+        levelMoney.put("六等奖", 5);
+        levelMoney.put("五等奖", 10);
+        levelMoney.put("四等奖", 200);
+        levelMoney.put("三等奖", 300);
+        levelMoney.put("二等奖", 1500000);
+        levelMoney.put("一等奖", 5000000);
+    }
+    public static int winMoney(String level) {
+        return levelMoney.getOrDefault(level, 0);
+    }
+
     private int compareNums(int[] nums1, int[] nums2) {
         int count = 0;
 
@@ -73,8 +89,12 @@ public class LotteryInfo {
 
         int[] reds = new int[items.length - 2];
         for (int i = 0; i < reds.length; i++) {
-            reds[i] = Integer.parseInt(items[ i + 1]);
+            reds[i] = convertInt(items[ i + 1]);
         }
-        return new LotteryInfo(items[0], reds, new int[]{Integer.parseInt(items[items.length - 1])});
+        return new LotteryInfo(items[0], reds, new int[]{convertInt(items[items.length - 1])});
+    }
+
+    private static int convertInt(String numStr) {
+        return Integer.parseInt(numStr, 10);
     }
 }
