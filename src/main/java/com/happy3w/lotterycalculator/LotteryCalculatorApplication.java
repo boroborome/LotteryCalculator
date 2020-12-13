@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,18 @@ import java.util.function.Function;
 
 @SpringBootApplication
 public class LotteryCalculatorApplication {
+
+	private static final List<RememberFunInfo> RememberFuns = Arrays.asList(
+			new RememberFunInfo("power weight", (weight) -> {
+				weight += 1;
+				weight *= weight;
+				return weight;
+			}),
+			new RememberFunInfo("plus 1", (weight) -> {
+				weight += 1;
+				return weight;
+			})
+	);
 
 	private static Function<Double, Double> DefaultRememberFun = (weight) -> {
 		weight += 1;
@@ -27,18 +40,28 @@ public class LotteryCalculatorApplication {
 
 		TestScore bestScore = null;
 
-		for (double forgetRate = 0.0001; forgetRate < 1; forgetRate += 0.0001) {
-			LotteryCalculator lotteryCalculator = new LotteryCalculator(DefaultRememberFun, forgetRate);
-			TestResult testResult = testCalculator(lotteryCalculator, lotteryInfos);
-			Map<String, Integer> winCounts = testResult.getWinCounts();
-			int winMoney = calculateMoney(winCounts);
-			if (bestScore == null || bestScore.getWinMoney() < winMoney) {
-				bestScore = new TestScore(forgetRate, winCounts, winMoney, testResult.nextLottery);
+		for (RememberFunInfo funInfo : RememberFuns) {
+			for (double forgetRate = 0.00001; forgetRate < 1; forgetRate += 0.00001) {
+				LotteryCalculator lotteryCalculator = new LotteryCalculator(DefaultRememberFun, forgetRate);
+				TestResult testResult = testCalculator(lotteryCalculator, lotteryInfos);
+				Map<String, Integer> winCounts = testResult.getWinCounts();
+				int winMoney = calculateMoney(winCounts);
+				if (bestScore == null || bestScore.getWinMoney() < winMoney) {
+					bestScore = TestScore.builder()
+							.rememberFunInfo(funInfo)
+							.forgetRate(forgetRate)
+							.winCounts(winCounts)
+							.winMoney(winMoney)
+							.nextLottery(testResult.nextLottery)
+							.build();
+				}
 			}
 		}
+
 		int cost = lotteryInfos.size() * 2;
 		System.out.println(bestScore.getWinCounts());
-		System.out.println(MessageFormat.format("ForgetRate:{0}; Cost:{1}; Win:{2}",
+		System.out.println(MessageFormat.format("RemFun:{0};ForgetRate:{1}; Cost:{2}; Win:{3}",
+				bestScore.getRememberFunInfo().getName(),
 				bestScore.getForgetRate(),
 				cost,
 				bestScore.getWinMoney()));
