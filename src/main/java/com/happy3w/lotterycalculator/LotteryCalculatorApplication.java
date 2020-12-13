@@ -40,21 +40,9 @@ public class LotteryCalculatorApplication {
 
 		TestScore bestScore = null;
 
-		for (RememberFunInfo funInfo : RememberFuns) {
-			for (double forgetRate = 0.00001; forgetRate < 1; forgetRate += 0.00001) {
-				LotteryCalculator lotteryCalculator = new LotteryCalculator(DefaultRememberFun, forgetRate);
-				TestResult testResult = testCalculator(lotteryCalculator, lotteryInfos);
-				Map<String, Integer> winCounts = testResult.getWinCounts();
-				int winMoney = calculateMoney(winCounts);
-				if (bestScore == null || bestScore.getWinMoney() < winMoney) {
-					bestScore = TestScore.builder()
-							.rememberFunInfo(funInfo)
-							.forgetRate(forgetRate)
-							.winCounts(winCounts)
-							.winMoney(winMoney)
-							.nextLottery(testResult.nextLottery)
-							.build();
-				}
+		for (double forgetRate = 0.00001; forgetRate < 1; forgetRate += 0.00001) {
+			for (RememberFunInfo funInfo : RememberFuns) {
+				bestScore = calculateBestScore(funInfo, forgetRate, lotteryInfos, bestScore);
 			}
 		}
 
@@ -66,6 +54,23 @@ public class LotteryCalculatorApplication {
 				cost,
 				bestScore.getWinMoney()));
 		System.out.println(bestScore.getNextLottery().getDesc());
+	}
+
+	private static TestScore calculateBestScore(RememberFunInfo funInfo, double forgetRate, List<LotteryInfo> lotteryInfos, TestScore bestScore) {
+		LotteryCalculator lotteryCalculator = new LotteryCalculator(DefaultRememberFun, forgetRate);
+		TestResult testResult = testCalculator(lotteryCalculator, lotteryInfos);
+		Map<String, Integer> winCounts = testResult.getWinCounts();
+		int winMoney = calculateMoney(winCounts);
+		if (bestScore == null || bestScore.getWinMoney() < winMoney) {
+			bestScore = TestScore.builder()
+					.rememberFunInfo(funInfo)
+					.forgetRate(forgetRate)
+					.winCounts(winCounts)
+					.winMoney(winMoney)
+					.nextLottery(testResult.nextLottery)
+					.build();
+		}
+		return bestScore;
 	}
 
 	private static TestResult testCalculator(LotteryCalculator lotteryCalculator, List<LotteryInfo> lotteryInfos) {
