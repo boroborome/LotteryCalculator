@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 @SpringBootApplication
 public class LotteryCalculatorApplication {
@@ -28,12 +27,6 @@ public class LotteryCalculatorApplication {
 				return weight;
 			})
 	);
-
-	private static Function<Double, Double> DefaultRememberFun = (weight) -> {
-		weight += 1;
-		weight *= weight;
-		return weight;
-	};
 
 	public static void main(String[] args) throws IOException {
 		List<LotteryInfo> lotteryInfos = loadAllLotteryInfos();

@@ -31,14 +31,6 @@ public class LotteryCalculator {
         this.forgetRate = forgetRate;
     }
 
-    public LotteryCalculator() {
-        this((weight) -> {
-            weight += 1;
-            weight *= weight;
-            return weight;
-        }, 0.568);
-    }
-
     private NumWeight[] newNumWeight(int count) {
         NumWeight[] weights = new NumWeight[count];
         for (int i = 0; i < count; i++) {
