@@ -38,13 +38,7 @@ public class LotteryCalculatorApplication {
 	public static void main(String[] args) throws IOException {
 		List<LotteryInfo> lotteryInfos = loadAllLotteryInfos();
 
-		TestScore bestScore = null;
-
-		for (double forgetRate = 0.00001; forgetRate < 1; forgetRate += 0.00001) {
-			for (RememberFunInfo funInfo : RememberFuns) {
-				bestScore = calculateBestScore(funInfo, forgetRate, lotteryInfos, bestScore);
-			}
-		}
+		TestScore bestScore = calculateBestScore(lotteryInfos, 0, 1);
 
 		int cost = lotteryInfos.size() * 2;
 		System.out.println(bestScore.getWinCounts());
@@ -54,6 +48,17 @@ public class LotteryCalculatorApplication {
 				cost,
 				bestScore.getWinMoney()));
 		System.out.println(bestScore.getNextLottery().getDesc());
+	}
+
+	private static TestScore calculateBestScore(List<LotteryInfo> lotteryInfos, double start, double end) {
+		TestScore bestScore = null;
+		double step = (end - start) / 100;
+		for (double forgetRate = start + step; forgetRate < end; forgetRate += step) {
+			for (RememberFunInfo funInfo : RememberFuns) {
+				bestScore = calculateBestScore(funInfo, forgetRate, lotteryInfos, bestScore);
+			}
+		}
+		return bestScore;
 	}
 
 	private static TestScore calculateBestScore(RememberFunInfo funInfo, double forgetRate, List<LotteryInfo> lotteryInfos, TestScore bestScore) {
