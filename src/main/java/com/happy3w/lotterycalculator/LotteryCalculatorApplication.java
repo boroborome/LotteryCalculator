@@ -82,7 +82,7 @@ public class LotteryCalculatorApplication {
 	}
 
 	private static TestScore calculateBestScore(RememberFunInfo funInfo, double forgetRate, List<LotteryInfo> lotteryInfos, TestScore bestScore) {
-		LotteryCalculator lotteryCalculator = new LotteryCalculator(DefaultRememberFun, forgetRate);
+		LotteryCalculator lotteryCalculator = new LotteryCalculator(funInfo.getRememberFun(), forgetRate);
 		TestResult testResult = testCalculator(lotteryCalculator, lotteryInfos);
 		Map<String, Integer> winCounts = testResult.getWinCounts();
 		int winMoney = calculateMoney(winCounts);
