@@ -29,10 +29,11 @@ public class LotteryCalculatorApplication {
 
 		for (double forgetRate = 0.0001; forgetRate < 1; forgetRate += 0.0001) {
 			LotteryCalculator lotteryCalculator = new LotteryCalculator(DefaultRememberFun, forgetRate);
-			Map<String, Integer> winCounts = testCalculator(lotteryCalculator, lotteryInfos);
+			TestResult testResult = testCalculator(lotteryCalculator, lotteryInfos);
+			Map<String, Integer> winCounts = testResult.getWinCounts();
 			int winMoney = calculateMoney(winCounts);
 			if (bestScore == null || bestScore.getWinMoney() < winMoney) {
-				bestScore = new TestScore(forgetRate, winCounts, winMoney);
+				bestScore = new TestScore(forgetRate, winCounts, winMoney, testResult.nextLottery);
 			}
 		}
 		int cost = lotteryInfos.size() * 2;
@@ -41,9 +42,10 @@ public class LotteryCalculatorApplication {
 				bestScore.getForgetRate(),
 				cost,
 				bestScore.getWinMoney()));
+		System.out.println(bestScore.getNextLottery().getDesc());
 	}
 
-	private static Map<String, Integer> testCalculator(LotteryCalculator lotteryCalculator, List<LotteryInfo> lotteryInfos) {
+	private static TestResult testCalculator(LotteryCalculator lotteryCalculator, List<LotteryInfo> lotteryInfos) {
 		Map<String, Integer> winCounts = new HashMap<>();
 		LotteryInfo nextLottery = null;
 		for (LotteryInfo info : lotteryInfos) {
@@ -56,7 +58,7 @@ public class LotteryCalculatorApplication {
 			}
 			nextLottery = newLottery;
 		}
-		return winCounts;
+		return new TestResult(winCounts, nextLottery);
 	}
 
 	private static List<LotteryInfo> loadAllLotteryInfos() throws IOException {
