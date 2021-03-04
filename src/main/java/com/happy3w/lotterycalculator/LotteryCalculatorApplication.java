@@ -1,5 +1,8 @@
 package com.happy3w.lotterycalculator;
 
+import com.happy3w.lotterycalculator.score.IBestScoreComparator;
+import com.happy3w.lotterycalculator.score.MoneyComparator;
+import com.happy3w.lotterycalculator.score.WinCountComparator;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.BufferedReader;
@@ -30,8 +33,17 @@ public class LotteryCalculatorApplication {
 
 	public static void main(String[] args) throws IOException {
 		List<LotteryInfo> lotteryInfos = loadAllLotteryInfos();
+		List<IBestScoreComparator> scoreComparators = Arrays.asList(
+				new MoneyComparator(),
+				new WinCountComparator()
+		);
+		for (IBestScoreComparator scoreComparator : scoreComparators) {
+			simulate(lotteryInfos, scoreComparator, 4);
+		}
+	}
 
-		TestScore bestScore = iterativeCalculateBestScore(lotteryInfos, 3);
+	private static void simulate(List<LotteryInfo> lotteryInfos, IBestScoreComparator scoreComparator, int times) {
+		TestScore bestScore = iterativeCalculateBestScore(lotteryInfos, scoreComparator, times);
 
 		int cost = lotteryInfos.size() * 2;
 		System.out.println(bestScore.getWinCounts());
@@ -45,14 +57,16 @@ public class LotteryCalculatorApplication {
 
 	private static final int StepCount = 100;
 
-	private static TestScore iterativeCalculateBestScore(List<LotteryInfo> lotteryInfos, int times) {
+	private static TestScore iterativeCalculateBestScore(List<LotteryInfo> lotteryInfos, IBestScoreComparator scoreComparator, int times) {
 		double start = 0;
 		double end = 1;
 		TestScore bestScore = null;
 		for (int i = 0; i < times; i++) {
 			TestScore curScore = calculateBestScore(lotteryInfos, start, end);
-			if (bestScore == null || bestScore.getWinMoney() < curScore.getWinMoney()) {
+			if (bestScore == null) {
 				bestScore = curScore;
+			} else {
+				bestScore = scoreComparator.bestScore(curScore, bestScore);
 			}
 
 			double step = (end - start) / StepCount;
